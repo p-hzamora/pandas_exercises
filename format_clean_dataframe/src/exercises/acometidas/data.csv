@@ -1,9 +1,9 @@
 Nombre Acometida;Solicitud de Pago;Ejecutado;Registro Conforme;Fecha último doc ;Empresa;Observaciones
-Alcantarillado;NO;NO;NO;-;-;-
-Agua Viviendas;NO;NO;NO;-;-;-
+Alcantarillado;NO;SÍ;NO;-;-;-
+Agua Viviendas;SÍ;NO;NO;-;-;-
 Agua PCI;NO;NO;NO;-;-;-
-Electricidad Viviendas;NO;NO;NO;-;-;-
-Electricidad Socorro;NO;NO;NO;-;-;-
-Electricidad CT;NO;NO;NO;-;-;-
-Gas;No procede;No procede;No procede;-;-;-
-Telefonía;NO;NO;NO;-;-;-
+Electricidad Viviendas;NO;SÍ;SÍ;-;-;-
+Electricidad Socorro;SÍ;SÍ;NO;-;-;-
+Electricidad CT;SÍ;NO;NO;-;SÍ;-
+Gas;No procede;No procede;No procede;-;SÍ;SÍ
+Telefonía;NO;SÍ;NO;-;-;-
