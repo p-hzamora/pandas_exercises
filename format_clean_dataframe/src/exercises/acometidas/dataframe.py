@@ -16,7 +16,7 @@ class AcometidasDataFrameCreator():
         # Agregar espacio para separar de observaciones
         df.loc[df.shape[0]] = ""
         df.loc[df.shape[0]] = ""
-        df.iloc[-1, 0] = r"{{ Acometidas_OBSERGENERAL }}"  # FIXME [ ]:  CORREGIR PARA QUE COJA EL DATO DE LA ETIQUETA de ACOMETIDAS
+        df.iloc[-1, 0] = r"Observaciones adicionales de la tabla" 
 
         return df
 
