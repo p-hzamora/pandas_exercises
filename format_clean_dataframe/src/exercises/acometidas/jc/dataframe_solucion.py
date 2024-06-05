@@ -1,44 +1,26 @@
-import pandas as pd
-import pyarrow as pa
-from pathlib import Path
-# import logger_decorator as ld
-
-
-def clean_dataframe(value: str) -> str:
-    """Clean the dataframe"""
-    
-    
-
-path = Path(__file__).parent.parent / 'data.csv'
-df = pd.read_csv(path, sep=';', dtype=str)
-print(df)
-# print(df.memory_usage(deep=True).sum())
-
-
 
 # path = Path(__file__).parent.parent / 'data.csv'
 # string_pa = pd.ArrowDtype(pa.string())
 # df = pd.read_csv(path, sep=';', dtype=string_pa, na_values=["-"])
 # print(df.info())
 
-
-
-# str = pd.ArrowDtype(pa.string())
-# cat = pd.CategoricalDtype()
-# u8 = pd.UInt8Dtype()
-# u16 = pd.UInt16Dtype()
-# u32 = pd.UInt32Dtype()
-# u64 = pd.UInt64Dtype()
-# i8 = pd.Int8Dtype()
-# i16 = pd.Int16Dtype()
-# i32 = pd.Int32Dtype()
-# i64 = pd.Int64Dtype()
-# f32 = pd.Float32Dtype()
-# f64 = pd.Float64Dtype()
-# bl = pd.BooleanDtype()
-# dt = pd.DatetimeTZDtype()
-# td = pd.Timedelta()
-# pr = pd.PeriodDtype()
+string_pa = pd.ArrowDtype(pa.string())
+str = pd.ArrowDtype(pa.string())
+cat = pd.CategoricalDtype()
+u8 = pd.UInt8Dtype()
+u16 = pd.UInt16Dtype()
+u32 = pd.UInt32Dtype()
+u64 = pd.UInt64Dtype()
+i8 = pd.Int8Dtype()
+i16 = pd.Int16Dtype()
+i32 = pd.Int32Dtype()
+i64 = pd.Int64Dtype()
+f32 = pd.Float32Dtype()
+f64 = pd.Float64Dtype()
+bl = pd.BooleanDtype()
+dt = pd.DatetimeTZDtype()
+td = pd.Timedelta()
+pr = pd.PeriodDtype()
 
 # try:
 #     df = pd.read_csv(
@@ -77,7 +59,7 @@ print(df)
 #     path = Path(__file__).parent.parent / 'data.csv'
 #     df = pd.read_csv(path, sep=';', dtype=str)
 #     print(df.memory_usage(deep=True).sum())
-#     return df   
+#     return df
 
 # load_data()
 

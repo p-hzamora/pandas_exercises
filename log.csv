@@ -1,0 +1,5 @@
+2024-05-27 19:17:08 - INFO - load_data - 11.404 ms
+2024-05-27 19:17:08 - INFO - replace_values - 2.745 ms
+2024-05-27 19:17:08 - INFO - replace_headers - 0.455 ms
+2024-05-27 19:17:08 - INFO - add_blank_rows - 6.893 ms
+2024-05-27 19:17:08 - INFO - add_observation_row - 0.717 ms
