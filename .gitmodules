@@ -1,0 +1,3 @@
+[submodule "modulos/fluent_validation"]
+	path = modulos/fluent_validation
+	url = git@github.com:p-hzamora/FluentValidation.git
