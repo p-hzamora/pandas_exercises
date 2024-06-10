@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import re
 import time
 from functools import wraps
 from enum import Enum
@@ -16,13 +15,13 @@ class eCols(Enum):
     PCT_TIEMPO = 'Pct_tiempo'
 
 class eMsg(Enum):
-    NO_NULO = 'no_nulo'
-    RANGO = 'rango'
+    NO_NULO = 'No nulo'
+    RANGO = 'Rango'
     ERROR_DE_TIPO = 'Error de tipo'
     VALORES_PERMITIDOS = 'valores_permitidos'
-    REGEX = 'regex'
-    FORMATO_FECHA = 'formato_fecha'
-    RANGO_FECHA = 'rango_fecha'
+    REGEX = 'Expresión regular'
+    FORMATO_FECHA = 'Formato fecha'
+    RANGO_FECHA = 'Rango fecha'
     TIENE_VALORES_NULOS = 'Tiene valores nulos'
     FUERA_DEL_RANGO = 'Fuera del rango'
     ERROR_DE_TIPO_MSG = 'Error de tipo'
@@ -30,6 +29,8 @@ class eMsg(Enum):
     NO_CUMPLE_PATRON = 'No cumple patrón'
     NO_CUMPLE_FORMATO = 'No cumple formato'
     NO_CUMPLE_RANGO = 'No cumple rango'
+    ERROR_LARGO_TEXTO = 'Texto con largo incorrecto'
+    LARGO_TEXTO = 'Largo texto'
 
 def medir_tiempo(func):
     @wraps(func)
@@ -39,8 +40,7 @@ def medir_tiempo(func):
         end_time = time.time()
         tiempo = end_time - start_time
         # Obtener información para agregar a resultados
-        columna, condicion, tipo_de_error, indices, expresion = result
-        self.agregar_resultado(columna, condicion, tipo_de_error, indices, expresion, tiempo)
+        self.agregar_resultado(*result, tiempo)
         return self
     return wrapper
 
@@ -48,9 +48,14 @@ class ValidadorDataFrame:
     def __init__(self, df):
         self.df = df
         self.resultados = pd.DataFrame(columns=[
-            eCols.COLUMNA.value, eCols.CONDICION.value, eCols.TIPO_DE_ERROR.value,
-            eCols.INDICES.value, eCols.EXPRESION.value, eCols.NUM_ERRORES.value,
-            eCols.TIEMPO.value, eCols.PCT_TIEMPO.value
+            eCols.COLUMNA.value, 
+            eCols.CONDICION.value, 
+            eCols.TIPO_DE_ERROR.value,
+            eCols.INDICES.value, 
+            eCols.EXPRESION.value, 
+            eCols.NUM_ERRORES.value,
+            eCols.TIEMPO.value, 
+            eCols.PCT_TIEMPO.value,
         ])
     
     def agregar_resultado(self, columna, condicion, tipo_de_error, indices, expresion, tiempo):
@@ -99,8 +104,7 @@ class ValidadorDataFrame:
     
     @medir_tiempo
     def validar_regex(self, columna, patron):
-        regex = re.compile(patron)
-        indices = self.df.index[~self.df[columna].apply(lambda x: regex.match(str(x)) is not None)].tolist()
+        indices = self.df.index[~self.df[columna].astype(str).str.match(patron, na=False)].tolist()
         expresion = f'{patron}'
         tipo_de_error = eMsg.NO_CUMPLE_PATRON.value if indices else ''
         return columna, eMsg.REGEX.value, tipo_de_error, indices, expresion
@@ -118,6 +122,15 @@ class ValidadorDataFrame:
         tipo_de_error = eMsg.NO_CUMPLE_FORMATO.value if len(indices) else ''
         return columna, eMsg.FORMATO_FECHA.value, tipo_de_error, indices, expresion
 
+
+    @medir_tiempo
+    def validar_largo_texto(self, columna, min_largo=None, max_largo=None):
+        min_largo = min_largo if min_largo else 0
+        max_largo = max_largo if max_largo else float('inf')
+        indices = self.df.index[~self.df[columna].astype(str).str.len().between(min_largo, max_largo)].tolist()
+        expresion = f'{min_largo}-{max_largo}'
+        tipo_de_error = eMsg.ERROR_LARGO_TEXTO.value if len(indices) else ''
+        return columna, eMsg.LARGO_TEXTO.value, tipo_de_error, indices, expresion
 
 
     @medir_tiempo
@@ -167,8 +180,8 @@ def test_validador_dataframe():
     data = {
         'edad': np.random.randint(10, 70, size=num_registros).astype(float),  # Algunas edades fuera de rango
         'salario': np.random.randint(30000, 90000, size=num_registros),
-        'nombre': np.random.choice(['Ana', 'Juan', 'Pedro', 'Luis', 'María'], size=num_registros),
-        'email': np.random.choice(['ana@example.com', 'juan@example.com', 'pedro@sample.com', 'invalid-email', 'maria@example.com'], size=num_registros),
+        'nombre': np.random.choice(['Ana', 'Juan', 'Pedro', 'Luis', 'María', None], size=num_registros),
+        'email': np.random.choice(['ana@example.com', 'juan@example.com', 'pedro@sample.com', 'a@a.com', 'maria@example.com'], size=num_registros),
         'fecha_ingreso': np.random.choice(['01/01/2020', '29/03/2021', '20/07/2022', '30/12/2023'], size=num_registros)
     }
 
@@ -178,7 +191,7 @@ def test_validador_dataframe():
     df.loc[np.random.choice(df.index, size=1000, replace=False), 'edad'] = np.nan
 
     # Introducir algunos valores fuera del rango de fechas
-    df.loc[np.random.choice(df.index, size=1000, replace=False), 'fecha_ingreso'] = '32/13/2020'
+    df.loc[np.random.choice(df.index, size=100, replace=False), 'fecha_ingreso'] = '32/13/2020'
 
     # Iniciar el temporizador
     start_time = time.time()
@@ -192,6 +205,7 @@ def test_validador_dataframe():
              .validar_tipo('salario', int) \
              .validar_no_nulo('nombre') \
              .validar_tipo('nombre', str) \
+             .validar_largo_texto('nombre', 3, 5) \
              .validar_valores_permitidos('nombre', ['Ana', 'Juan', 'Pedro', 'Luis', 'María']) \
              .validar_formato_fecha('fecha_ingreso', '%d/%m/%Y') \
              .validar_rango_fecha('fecha_ingreso', '%d/%m/%Y', '01/01/2020', '31/12/2023') \
